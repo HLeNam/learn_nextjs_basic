@@ -10,6 +10,7 @@ export default function Home() {
                 <Button className="cursor-pointer">Button</Button>
                 <Input type="text" name="firstname" />
                 <Card />
+                <h1 className="text-4xl font-thin text-center">Xin chào</h1>
             </div>
 
             <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
