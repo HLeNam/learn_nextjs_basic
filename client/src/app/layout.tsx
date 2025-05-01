@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 import Header from "@/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -24,6 +25,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${inter.className} antialiased`}>
+                <Toaster richColors />
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
