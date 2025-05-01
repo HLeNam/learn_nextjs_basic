@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
+import Header from "@/components/header";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -29,6 +30,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
+                    <Header />
                     {children}
                 </ThemeProvider>
             </body>
