@@ -5,13 +5,48 @@ type CustomOptions = RequestInit & {
     baseUrl?: string | undefined;
 };
 
-class HttpError extends Error {
+const ENTITY_ERROR_STATUS = 422;
+
+type EntityErrorPayload = {
+    message: string;
+    errors: {
+        field: string;
+        message: string;
+    }[];
+};
+
+export class HttpError extends Error {
     status: number;
-    payload: unknown;
-    constructor({ status, payload }: { status: number; payload: unknown }) {
+    payload: {
+        message: string;
+        [key: string]: unknown;
+    };
+    constructor({
+        status,
+        payload,
+    }: {
+        status: number;
+        payload: {
+            message: string;
+            [key: string]: unknown;
+        };
+    }) {
         super("Http Error");
         this.status = status;
         this.payload = payload;
+    }
+}
+
+export class EntityError extends HttpError {
+    status = ENTITY_ERROR_STATUS;
+    payload: EntityErrorPayload;
+    constructor(payload: EntityErrorPayload) {
+        super({
+            status: ENTITY_ERROR_STATUS,
+            payload,
+        });
+        this.payload = payload;
+        this.status = ENTITY_ERROR_STATUS;
     }
 }
 
@@ -67,7 +102,19 @@ const request = async <Response>(
     };
 
     if (!res.ok) {
-        throw new HttpError(data);
+        if (res.status === ENTITY_ERROR_STATUS) {
+            throw new EntityError(payload as EntityErrorPayload);
+        } else {
+            throw new HttpError(
+                data as {
+                    status: number;
+                    payload: {
+                        message: string;
+                        [key: string]: unknown;
+                    };
+                }
+            );
+        }
     }
 
     if (["/auth/login", "/auth/register"].some((path) => url.includes(path))) {

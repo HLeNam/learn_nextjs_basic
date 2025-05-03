@@ -17,21 +17,16 @@ import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
 import authApiRequests from "@/apiRequests/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { handleErrorApi } from "@/lib/utils";
+import { useState } from "react";
 // import { clientSessionToken } from "@/lib/http";
 // import { useAppContext } from "@/app/AppProvider";
-
-// Định nghĩa interface cho cấu trúc lỗi API
-interface ApiErrorResponse {
-    status: number;
-    payload: {
-        message: string;
-        errors?: { field: string; message: string }[];
-    };
-}
 
 const RegisterForm = () => {
     // const { setSessionToken } = useAppContext();
     const router = useRouter();
+
+    const [loading, setLoading] = useState(false);
 
     // 1. Define your form.
     const form = useForm<RegisterBodyType>({
@@ -46,6 +41,8 @@ const RegisterForm = () => {
 
     // 2. Define a submit handler.
     async function onSubmit(values: RegisterBodyType) {
+        if (loading) return;
+        setLoading(true);
         try {
             const result = await authApiRequests.register(values);
 
@@ -62,32 +59,12 @@ const RegisterForm = () => {
             // Chuyển hướng đến trang "/me"
             router.push("/me");
         } catch (error: unknown) {
-            // Kiểm tra xem lỗi có cấu trúc giống ApiErrorResponse không
-            if (error && typeof error === "object" && "status" in error && "payload" in error) {
-                const apiError = error as ApiErrorResponse;
-
-                if (apiError.status === 422 && apiError.payload.errors) {
-                    apiError.payload.errors.forEach((err) => {
-                        const field = err.field as keyof RegisterBodyType;
-                        form.setError(field, {
-                            type: "server",
-                            message: err.message,
-                        });
-                    });
-                } else {
-                    toast.error("Lỗi", {
-                        description: apiError.payload.message,
-                    });
-                }
-            } else if (error instanceof Error) {
-                // Xử lý các lỗi JavaScript thông thường
-                toast.error("Lỗi", {
-                    description: error.message,
-                });
-            } else {
-                // Xử lý các lỗi không xác định
-                toast.error("Đã xảy ra lỗi không xác định");
-            }
+            handleErrorApi<RegisterBodyType>({
+                error,
+                setError: form.setError,
+            });
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -152,7 +129,7 @@ const RegisterForm = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="mt-8 w-full">
+                <Button type="submit" className="mt-8 w-full" disabled={loading}>
                     Đăng ký
                 </Button>
             </form>
