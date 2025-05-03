@@ -26,5 +26,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: [...PRIVATE_PATHS, ...AUTH_PATHS],
+    matcher: ["/me", "/login", "/register"],
 };

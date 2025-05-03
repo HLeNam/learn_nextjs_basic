@@ -14,9 +14,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema";
-import envConfig from "@/config";
+import authApiRequests from "@/apiRequests/auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+// import { clientSessionToken } from "@/lib/http";
+// import { useAppContext } from "@/app/AppProvider";
+
+// Định nghĩa interface cho cấu trúc lỗi API
+interface ApiErrorResponse {
+    status: number;
+    payload: {
+        message: string;
+        errors?: { field: string; message: string }[];
+    };
+}
 
 const RegisterForm = () => {
+    // const { setSessionToken } = useAppContext();
+    const router = useRouter();
+
     // 1. Define your form.
     const form = useForm<RegisterBodyType>({
         resolver: zodResolver(RegisterBody),
@@ -30,21 +46,49 @@ const RegisterForm = () => {
 
     // 2. Define a submit handler.
     async function onSubmit(values: RegisterBodyType) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values);
+        try {
+            const result = await authApiRequests.register(values);
 
-        // console.log(process.env.NEXT_PUBLIC_API_ENDPOINT);
+            const resultFromNextServer = await authApiRequests.auth({
+                sessionToken: result.payload.data.token,
+            });
 
-        const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(values),
-        }).then((res) => res.json());
+            console.log(">>> resultFromNextServer", resultFromNextServer);
 
-        console.log(result);
+            toast.success(result.payload.message);
+            // setSessionToken(result.payload.data.token);
+            // clientSessionToken.value = result.payload.data.token;
+
+            // Chuyển hướng đến trang "/me"
+            router.push("/me");
+        } catch (error: unknown) {
+            // Kiểm tra xem lỗi có cấu trúc giống ApiErrorResponse không
+            if (error && typeof error === "object" && "status" in error && "payload" in error) {
+                const apiError = error as ApiErrorResponse;
+
+                if (apiError.status === 422 && apiError.payload.errors) {
+                    apiError.payload.errors.forEach((err) => {
+                        const field = err.field as keyof RegisterBodyType;
+                        form.setError(field, {
+                            type: "server",
+                            message: err.message,
+                        });
+                    });
+                } else {
+                    toast.error("Lỗi", {
+                        description: apiError.payload.message,
+                    });
+                }
+            } else if (error instanceof Error) {
+                // Xử lý các lỗi JavaScript thông thường
+                toast.error("Lỗi", {
+                    description: error.message,
+                });
+            } else {
+                // Xử lý các lỗi không xác định
+                toast.error("Đã xảy ra lỗi không xác định");
+            }
+        }
     }
 
     return (

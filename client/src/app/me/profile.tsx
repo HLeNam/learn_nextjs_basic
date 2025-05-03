@@ -2,39 +2,22 @@
 
 import { useEffect } from "react";
 
-import { useAppContext } from "@/app/AppProvider";
-import envConfig from "@/config";
+// import { useAppContext } from "@/app/AppProvider";
+import accountApiRequests from "@/apiRequests/account";
+// import { clientSessionToken } from "@/lib/http";
 
 const Profile = () => {
-    const { sessionToken } = useAppContext();
+    // const { sessionToken } = useAppContext();
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/account/me`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${sessionToken}`,
-                },
-            }).then(async (res) => {
-                const payload = await res.json();
-                const data = {
-                    status: res.status,
-                    payload: payload,
-                };
-
-                if (!res.ok) {
-                    throw data;
-                }
-
-                return data;
-            });
+            const result = await accountApiRequests.meClient();
 
             return result;
         };
 
         fetchData();
-    }, [sessionToken]);
+    }, []);
 
     return <div>Profile</div>;
 };

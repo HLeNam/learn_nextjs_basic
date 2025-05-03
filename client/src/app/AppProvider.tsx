@@ -1,22 +1,32 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    // useLayoutEffect,
+    useState,
+    // useContext,
+    // useState,
+} from "react";
 
-const AppContext = createContext<{
-    sessionToken: string;
-    setSessionToken: React.Dispatch<React.SetStateAction<string>>;
-}>({
-    sessionToken: "",
-    setSessionToken: () => {},
-});
+import { clientSessionToken } from "@/lib/http";
 
-export const useAppContext = () => {
-    const context = useContext(AppContext);
-    if (!context) {
-        throw new Error("useAppContext must be used within an AppProvider");
-    }
-    return context;
-};
+// const AppContext = createContext<{
+//     sessionToken: string;
+//     setSessionToken: React.Dispatch<React.SetStateAction<string>>;
+// }>({
+//     sessionToken: "",
+//     setSessionToken: () => {},
+// });
+
+const AppContext = createContext({});
+
+// export const useAppContext = () => {
+//     const context = useContext(AppContext);
+//     if (!context) {
+//         throw new Error("useAppContext must be used within an AppProvider");
+//     }
+//     return context;
+// };
 
 export default function AppProvider({
     children,
@@ -25,11 +35,17 @@ export default function AppProvider({
     children: React.ReactNode;
     initialSessionToken: string | undefined;
 }) {
-    const [sessionToken, setSessionToken] = useState<string>(initialSessionToken || "");
+    // const [sessionToken, setSessionToken] = useState<string>(initialSessionToken || "");
 
-    return (
-        <AppContext.Provider value={{ sessionToken, setSessionToken }}>
-            {children}
-        </AppContext.Provider>
-    );
+    useState(() => {
+        if (typeof window !== "undefined") {
+            clientSessionToken.value = initialSessionToken || "";
+        }
+    });
+
+    // useLayoutEffect(() => {
+    //     sessionToken.value = initialSessionToken;
+    // }, [initialSessionToken]);
+
+    return <AppContext.Provider value={{}}>{children}</AppContext.Provider>;
 }

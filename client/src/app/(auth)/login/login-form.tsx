@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
-import envConfig from "@/config";
-import { useAppContext } from "@/app/AppProvider";
+// import { useAppContext } from "@/app/AppProvider";
+import authApiRequests from "@/apiRequests/auth";
+import { useRouter } from "next/navigation";
+// import { clientSessionToken } from "@/lib/http";
 
 // Định nghĩa interface cho cấu trúc lỗi API
 interface ApiErrorResponse {
@@ -28,7 +30,8 @@ interface ApiErrorResponse {
 }
 
 const LoginForm = () => {
-    const { setSessionToken } = useAppContext();
+    // const { setSessionToken } = useAppContext();
+    const router = useRouter();
 
     // 1. Define your form.
     const form = useForm<LoginBodyType>({
@@ -42,50 +45,20 @@ const LoginForm = () => {
     // 2. Define a submit handler.
     async function onSubmit(values: LoginBodyType) {
         try {
-            const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            }).then(async (res) => {
-                const payload = await res.json();
-                const data = {
-                    status: res.status,
-                    payload: payload,
-                };
+            const result = await authApiRequests.login(values);
 
-                if (!res.ok) {
-                    throw data;
-                }
-
-                return data;
-            });
-            toast.success(result.payload.message);
-
-            const resultFromNextServer = await fetch("/api/auth", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(result),
-            }).then(async (res) => {
-                const payload = await res.json();
-                const data = {
-                    status: res.status,
-                    payload: payload,
-                };
-
-                if (!res.ok) {
-                    throw data;
-                }
-
-                return data;
+            const resultFromNextServer = await authApiRequests.auth({
+                sessionToken: result.payload.data.token,
             });
 
             console.log(">>> resultFromNextServer", resultFromNextServer);
 
-            setSessionToken(resultFromNextServer.payload.data.token);
+            toast.success(result.payload.message);
+            // setSessionToken(result.payload.data.token);
+            // clientSessionToken.value = result.payload.data.token;
+
+            // Chuyển hướng đến trang "/me"
+            router.push("/me");
         } catch (error: unknown) {
             // Kiểm tra xem lỗi có cấu trúc giống ApiErrorResponse không
             if (error && typeof error === "object" && "status" in error && "payload" in error) {
