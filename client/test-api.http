@@ -1,0 +1,8 @@
+@rootUrl = http://localhost:3000/api
+
+### set token
+POST {{rootUrl}}/auth/
+
+{
+    "sessionToken": 123
+}

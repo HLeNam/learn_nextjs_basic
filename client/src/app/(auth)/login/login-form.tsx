@@ -16,8 +16,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import envConfig from "@/config";
+import { useAppContext } from "@/app/AppProvider";
+
+// Định nghĩa interface cho cấu trúc lỗi API
+interface ApiErrorResponse {
+    status: number;
+    payload: {
+        message: string;
+        errors?: { field: string; message: string }[];
+    };
+}
 
 const LoginForm = () => {
+    const { setSessionToken } = useAppContext();
+
     // 1. Define your form.
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
@@ -29,11 +41,6 @@ const LoginForm = () => {
 
     // 2. Define a submit handler.
     async function onSubmit(values: LoginBodyType) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        // console.log(values);
-
-        // console.log(process.env.NEXT_PUBLIC_API_ENDPOINT);
         try {
             const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`, {
                 method: "POST",
@@ -55,26 +62,56 @@ const LoginForm = () => {
                 return data;
             });
             toast.success(result.payload.message);
-            // console.log(result);
-        } catch (error: any) {
-            // console.log(error);
-            const errors = error.payload.errors as { field: string; message: string }[];
 
-            const status = error.status as number;
-            if (status === 422) {
-                errors.forEach((error: { field: string; message: string }) => {
-                    const field = error.field as keyof LoginBodyType;
-                    const message = error.message;
+            const resultFromNextServer = await fetch("/api/auth", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(result),
+            }).then(async (res) => {
+                const payload = await res.json();
+                const data = {
+                    status: res.status,
+                    payload: payload,
+                };
 
-                    form.setError(field, {
-                        type: "server",
-                        message: message,
+                if (!res.ok) {
+                    throw data;
+                }
+
+                return data;
+            });
+
+            console.log(">>> resultFromNextServer", resultFromNextServer);
+
+            setSessionToken(resultFromNextServer.payload.data.token);
+        } catch (error: unknown) {
+            // Kiểm tra xem lỗi có cấu trúc giống ApiErrorResponse không
+            if (error && typeof error === "object" && "status" in error && "payload" in error) {
+                const apiError = error as ApiErrorResponse;
+
+                if (apiError.status === 422 && apiError.payload.errors) {
+                    apiError.payload.errors.forEach((err) => {
+                        const field = err.field as keyof LoginBodyType;
+                        form.setError(field, {
+                            type: "server",
+                            message: err.message,
+                        });
                     });
+                } else {
+                    toast.error("Lỗi", {
+                        description: apiError.payload.message,
+                    });
+                }
+            } else if (error instanceof Error) {
+                // Xử lý các lỗi JavaScript thông thường
+                toast.error("Lỗi", {
+                    description: error.message,
                 });
             } else {
-                toast.error("Lỗi", {
-                    description: error.payload.message,
-                });
+                // Xử lý các lỗi không xác định
+                toast.error("Đã xảy ra lỗi không xác định");
             }
         }
     }
