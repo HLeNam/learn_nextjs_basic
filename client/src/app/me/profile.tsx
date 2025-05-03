@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 // import { useAppContext } from "@/app/AppProvider";
 import accountApiRequests from "@/apiRequests/account";
+import { handleErrorApi } from "@/lib/utils";
 // import { clientSessionToken } from "@/lib/http";
 
 const Profile = () => {
@@ -11,9 +12,17 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await accountApiRequests.meClient();
+            try {
+                const result = await accountApiRequests.meClient();
 
-            return result;
+                return result;
+            } catch (error) {
+                handleErrorApi({
+                    error,
+                    // setError: setError,
+                    // duration: 3000,
+                });
+            }
         };
 
         fetchData();

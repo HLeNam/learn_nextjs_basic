@@ -8,12 +8,21 @@ const MeProfile = async () => {
 
     const sessionToken = cookieStore.get("sessionToken")?.value ?? "";
 
-    const result = await accountApiRequests.me(sessionToken as string);
+    // console.log("sessionToken", sessionToken);
+
+    let result = null;
+    try {
+        result = await accountApiRequests.me(sessionToken as string);
+
+        console.log("result", result);
+    } catch (error) {
+        console.log("error", error);
+    }
 
     return (
         <div>
             <h1>Profile</h1>
-            <div>Xin chào {result.payload.data.name}</div>
+            <div>Xin chào {result?.payload?.data?.name ?? "Guest"}</div>
             <Profile />
         </div>
     );
