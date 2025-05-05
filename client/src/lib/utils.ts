@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import { FieldValues, Path, UseFormSetError } from "react-hook-form";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import jwt from "jsonwebtoken";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -34,5 +35,9 @@ export const handleErrorApi = <T extends FieldValues>({
 };
 
 export const normalizePath = (path: string) => {
-  return path.startsWith("/") ? path.slice(1) : path;
-}
+    return path.startsWith("/") ? path.slice(1) : path;
+};
+
+export const decodeJWT = <Payload = unknown>(token: string) => {
+    return jwt.decode(token) as Payload;
+};
