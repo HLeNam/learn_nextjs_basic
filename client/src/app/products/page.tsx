@@ -1,4 +1,5 @@
 import productApiRequests from "@/apiRequests/product";
+import DeleteProductButton from "@/app/products/_components/delete-product-button";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,7 +39,7 @@ const ProductListPage = async () => {
                                     width={180}
                                     height={270}
                                     priority
-                                    className="rounded-md object-cover"
+                                    className="w-full h-auto rounded-md object-cover"
                                 />
 
                                 {product.name}
@@ -50,8 +51,7 @@ const ProductListPage = async () => {
                                     <Link href={`/products/${product.id}`}>
                                         <Button variant="outline">Edit</Button>
                                     </Link>
-
-                                    <Button variant="destructive">Delete</Button>
+                                    <DeleteProductButton product={product} />
                                 </div>
                             </td>
                         </tr>

@@ -204,12 +204,8 @@ const http = {
         return request<Response>("PUT", url, { ...options, body: body as BodyInit });
     },
 
-    delete<Response>(
-        url: string,
-        body: unknown,
-        options?: Omit<CustomOptions, "body"> | undefined
-    ) {
-        return request<Response>("DELETE", url, { ...options, body: body as BodyInit });
+    delete<Response>(url: string, options?: Omit<CustomOptions, "body"> | undefined) {
+        return request<Response>("DELETE", url, { ...options });
     },
 };
 

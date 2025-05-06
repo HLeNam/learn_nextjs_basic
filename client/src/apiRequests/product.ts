@@ -1,4 +1,5 @@
 import http from "@/lib/http";
+import { MessageResType } from "@/schemaValidations/common.schema";
 import {
     CreateProductBodyType,
     ProductListResType,
@@ -21,6 +22,10 @@ const productApiRequests = {
 
     update: (id: number, body: UpdateProductBodyType) => {
         return http.put<ProductResType>(`/products/${id}`, body);
+    },
+
+    delete: (id: number) => {
+        return http.delete<MessageResType>(`/products/${id}`);
     },
 
     uploadImage: (body: FormData) => {
