@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 
 import Profile from "@/app/me/profile";
 import accountApiRequests from "@/apiRequests/account";
+import ProfileForm from "@/app/me/profile-form";
 
 const MeProfile = async () => {
     const cookieStore = await cookies();
@@ -10,6 +11,7 @@ const MeProfile = async () => {
 
     // console.log("sessionToken", sessionToken);
 
+    // Vì dùng cookie nên api này không được cache trên server
     let result = null;
     result = await accountApiRequests.me(sessionToken as string);
 
@@ -18,6 +20,7 @@ const MeProfile = async () => {
             <h1>Profile</h1>
             <div>Xin chào {result?.payload?.data?.name ?? "Guest"}</div>
             <Profile />
+            <ProfileForm profile={result?.payload?.data} />
         </div>
     );
 };
