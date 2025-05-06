@@ -1,9 +1,13 @@
 import http from "@/lib/http";
-import { CreateProductBodyType, ProductResType } from "@/schemaValidations/product.schema";
+import {
+    CreateProductBodyType,
+    ProductListResType,
+    ProductResType,
+} from "@/schemaValidations/product.schema";
 
 const productApiRequests = {
-    get: () => {
-        return http.get("/products");
+    getList: () => {
+        return http.get<ProductListResType>("/products");
     },
 
     create: (body: CreateProductBodyType) => {
