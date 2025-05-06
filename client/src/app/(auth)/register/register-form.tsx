@@ -48,6 +48,7 @@ const RegisterForm = () => {
 
             const resultFromNextServer = await authApiRequests.auth({
                 sessionToken: result.payload.data.token,
+                expiresAt: result.payload.data.expiresAt,
             });
 
             console.log(">>> resultFromNextServer", resultFromNextServer);

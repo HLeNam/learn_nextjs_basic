@@ -8,6 +8,7 @@ import Header from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
 import AppProvider from "@/app/AppProvider";
 import { cookies } from "next/headers";
+import SlideSession from "@/components/slide-session";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -38,7 +39,9 @@ export default async function RootLayout({
                     disableTransitionOnChange
                 >
                     <Header />
-                    <AppProvider initialSessionToken={sessionToken}>{children}</AppProvider>
+                    <AppProvider initialSessionToken={sessionToken}>
+                        {children} <SlideSession />
+                    </AppProvider>
                 </ThemeProvider>
             </body>
         </html>

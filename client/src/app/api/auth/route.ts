@@ -1,16 +1,8 @@
-import { decodeJWT } from "@/lib/utils";
-
-type PayloadJWT = {
-    iat: number;
-    exp: number;
-    tokenType: string;
-    userId: number;
-};
-
 export async function POST(request: Request) {
     const res = await request.json();
 
     const sessionToken = res.sessionToken as string | undefined;
+    const expiresAt = res.expiresAt as string;
 
     if (!sessionToken) {
         return Response.json(
@@ -21,9 +13,7 @@ export async function POST(request: Request) {
         );
     }
 
-    // Decode the JWT token to get the payload
-    const decodedPayload = decodeJWT<PayloadJWT>(sessionToken);
-    const expiresDate = new Date(decodedPayload.exp * 1000).toUTCString();
+    const expiresDate = new Date(expiresAt).toUTCString();
     return Response.json(res, {
         status: 200,
         headers: {

@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import ButtonRedirect from "@/app/components/ButtonRedirect";
 import { Button } from "@/components/ui/button";
+import ButtonRedirect from "@/app/components/ButtonRedirect";
 
 const isAuth = true; // Simulating authentication status
 export default function Home() {
