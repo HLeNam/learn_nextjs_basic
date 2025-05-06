@@ -88,12 +88,22 @@ const request = async <Response>(
     url: string,
     options?: CustomOptions | undefined
 ) => {
-    const body = options?.body ? JSON.stringify(options.body) : undefined;
+    const body = options?.body
+        ? options.body instanceof FormData
+            ? options.body
+            : JSON.stringify(options.body)
+        : undefined;
 
-    const baseHeaders = {
+    const baseHeaders: Record<string, string | undefined> = {
         "Content-Type": "application/json",
         Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : "",
     };
+
+    if (body instanceof FormData) {
+        if ("Content-Type" in baseHeaders) {
+            delete baseHeaders["Content-Type"];
+        }
+    }
 
     const baseUrl =
         options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl;
@@ -106,7 +116,7 @@ const request = async <Response>(
         headers: {
             ...baseHeaders,
             ...options?.headers,
-        },
+        } as HeadersInit,
         body,
     });
 
@@ -130,7 +140,7 @@ const request = async <Response>(
                         }),
                         headers: {
                             ...baseHeaders,
-                        },
+                        } as HeadersInit,
                     });
 
                     await clientLogoutRequest.json();
