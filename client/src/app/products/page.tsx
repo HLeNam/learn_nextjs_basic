@@ -1,6 +1,7 @@
 import productApiRequests from "@/apiRequests/product";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 const ProductListPage = async () => {
     const {
@@ -10,6 +11,12 @@ const ProductListPage = async () => {
     return (
         <div>
             <h1>Product List</h1>
+            <Link
+                href="/products/add"
+                className="mb-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+                Thêm sản phẩm
+            </Link>
             <table>
                 <thead>
                     <tr>
@@ -40,7 +47,10 @@ const ProductListPage = async () => {
                             <td>{product.description}</td>
                             <td>
                                 <div className="flex items-center gap-2">
-                                    <Button variant="outline">Edit</Button>
+                                    <Link href={`/products/${product.id}`}>
+                                        <Button variant="outline">Edit</Button>
+                                    </Link>
+
                                     <Button variant="destructive">Delete</Button>
                                 </div>
                             </td>

@@ -22,6 +22,7 @@ export class HttpError extends Error {
     status: number;
     payload: {
         message: string;
+        statusCode?: number;
         [key: string]: unknown;
     };
     constructor({
@@ -37,6 +38,14 @@ export class HttpError extends Error {
         super("Http Error");
         this.status = status;
         this.payload = payload;
+    }
+
+    get errorPayload() {
+        return this.payload;
+    }
+
+    get statusCode() {
+        return this.status;
     }
 }
 
@@ -157,15 +166,14 @@ const request = async <Response>(
                 redirect(`/logout?sessionToken=${sessionToken}`);
             }
         } else {
-            throw new HttpError(
-                data as {
-                    status: number;
-                    payload: {
-                        message: string;
-                        [key: string]: unknown;
-                    };
-                }
-            );
+            const error = new HttpError({
+                status: data.status,
+                payload: data.payload as {
+                    message: string;
+                    [key: string]: unknown;
+                },
+            });
+            throw error;
         }
     }
 

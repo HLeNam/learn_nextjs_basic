@@ -7,7 +7,7 @@ const Header = () => {
         <div>
             <ul>
                 <li>
-                    <Link href={`/products/add`}>Thêm sản phẩm</Link>
+                    <Link href={`/products`}>Sản phẩm</Link>
                 </li>
                 <li>
                     <Link href={`/login`}>Đăng nhập</Link>
