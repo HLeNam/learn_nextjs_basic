@@ -1,6 +1,6 @@
 import productApiRequests from "@/apiRequests/product";
+import ProductAddForm from "@/app/products/_components/product-add-form";
 import { HttpError } from "@/lib/http";
-import Image from "next/image";
 
 const ProductEdit = async ({
     params,
@@ -43,17 +43,7 @@ const ProductEdit = async ({
 
             {product && (
                 <div className="flex flex-col items-center justify-center gap-2">
-                    <h1 className="text-3xl font-bold">{product.name}</h1>
-                    <Image
-                        src={product.image}
-                        alt={product.name}
-                        width={180}
-                        height={270}
-                        priority
-                        className="rounded-md object-cover"
-                    />
-                    <p>{product.description}</p>
-                    <p>{product.price}</p>
+                    <ProductAddForm product={product} />
                 </div>
             )}
         </div>

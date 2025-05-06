@@ -14,16 +14,22 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { handleErrorApi } from "@/lib/utils";
 import { useState } from "react";
-import { CreateProductBody, CreateProductBodyType } from "@/schemaValidations/product.schema";
+import {
+    CreateProductBody,
+    CreateProductBodyType,
+    ProductResType,
+} from "@/schemaValidations/product.schema";
 import productApiRequests from "@/apiRequests/product";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 
-const ProductAddForm = () => {
-    const router = useRouter();
+type Product = ProductResType["data"];
+
+const ProductAddForm = ({ product }: { product?: Product }) => {
+    // const router = useRouter();
 
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
@@ -32,12 +38,14 @@ const ProductAddForm = () => {
     const form = useForm<CreateProductBodyType>({
         resolver: zodResolver(CreateProductBody),
         defaultValues: {
-            name: "",
-            price: 0,
-            description: "",
-            image: "",
+            name: product?.name ?? "",
+            price: product?.price ?? 0,
+            description: product?.description ?? "",
+            image: product?.image ?? "",
         },
     });
+
+    const image = form.watch("image");
 
     // 2. Define a submit handler.
     async function onSubmit(values: CreateProductBodyType) {
@@ -50,18 +58,35 @@ const ProductAddForm = () => {
                 values.image = "http:/localhost:3000/" + file.name; // Hoặc URL từ kết quả upload
             }
 
-            const formData = new FormData();
-            formData.append("file", file!);
-            const uploadImageResult = await productApiRequests.uploadImage(formData);
-            const imageUrl = uploadImageResult.payload.data;
+            let imageUrl = "";
+            if (file) {
+                const formData = new FormData();
+                formData.append("file", file!);
+                const uploadImageResult = await productApiRequests.uploadImage(formData);
+                imageUrl = uploadImageResult.payload.data;
+                values.image = imageUrl;
+            } else if (product) {
+                imageUrl = form.getValues("image");
+                values.image = imageUrl;
+            }
 
-            const result = await productApiRequests.create({
-                ...values,
-                image: imageUrl,
-            });
+            let result = null;
+
+            if (product) {
+                // Nếu có sản phẩm, gọi API cập nhật
+                result = await productApiRequests.update(product.id, {
+                    ...values,
+                });
+            } else {
+                // Nếu không có sản phẩm, gọi API tạo mới
+                result = await productApiRequests.create({
+                    ...values,
+                    image: imageUrl,
+                });
+            }
 
             toast.success(result.payload.message);
-            router.push("/products");
+            // router.push("/products");
         } catch (error: unknown) {
             handleErrorApi<CreateProductBodyType>({
                 error,
@@ -94,7 +119,6 @@ const ProductAddForm = () => {
 
     return (
         <Form {...form}>
-            <h1>Thêm sản phẩm</h1>
             <form
                 onSubmit={form.handleSubmit(onSubmit, (error) => {
                     console.log(error);
@@ -164,11 +188,13 @@ const ProductAddForm = () => {
                     )}
                 />
 
-                {file && (
+                {(file || image) && (
                     <div className="mt-2">
-                        <p className="text-sm text-gray-500">Hình ảnh đã chọn: {file.name}</p>
+                        <p className="text-sm text-gray-500">
+                            Hình ảnh đã chọn: {file?.name ?? image ?? ""}
+                        </p>
                         <Image
-                            src={URL.createObjectURL(file)}
+                            src={file ? URL.createObjectURL(file as File) : image ?? ""}
                             alt="Selected Image"
                             width={128}
                             height={128}
@@ -190,7 +216,11 @@ const ProductAddForm = () => {
                 )}
 
                 <Button type="submit" className="mt-8 w-full" disabled={loading}>
-                    Thêm sản phẩm
+                    {loading
+                        ? "Đang xử lý..."
+                        : product
+                        ? "Cập nhật sản phẩm"
+                        : "Thêm mới sản phẩm"}
                 </Button>
             </form>
         </Form>
