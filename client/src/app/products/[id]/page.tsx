@@ -3,6 +3,9 @@ import { HttpError } from "@/lib/http";
 import { Metadata } from "next";
 import Image from "next/image";
 
+import envConfig from "@/config";
+import { baseOpenGraphMetadata } from "@/app/shared-metadata";
+
 type Props = {
     params: Promise<{ id: string }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -18,9 +21,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     } = await productApiRequests.getDetail(Number(id));
     const product = data;
 
+    const url = envConfig.NEXT_PUBLIC_URL + "/products/" + product.id;
+
     return {
         title: product.name,
         description: product.description,
+        openGraph: {
+            title: product.name,
+            description: product.description,
+            url: url,
+            siteName: "Productic Company",
+            images: [
+                {
+                    url: product.image,
+                },
+            ],
+            ...baseOpenGraphMetadata,
+        },
+        alternates: {
+            canonical: url,
+        },
     };
 }
 

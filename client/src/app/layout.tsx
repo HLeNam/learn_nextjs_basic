@@ -11,6 +11,7 @@ import { cookies } from "next/headers";
 import SlideSession from "@/components/slide-session";
 import accountApiRequests from "@/apiRequests/account";
 import { AccountResType } from "@/schemaValidations/account.schema";
+import { baseOpenGraphMetadata } from "@/app/shared-metadata";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
         default: "Productic",
     },
     description: "Được tạo bởi Yorick",
+    openGraph: baseOpenGraphMetadata,
 };
 
 export default async function RootLayout({
