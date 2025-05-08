@@ -1,20 +1,18 @@
 "use client";
 
 import authApiRequests from "@/apiRequests/auth";
-import { clientSessionToken } from "@/lib/http";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LogoutPage = () => {
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
 
-    const sessionToken = searchParams.get("sessionToken");
     useEffect(() => {
+        const sessionToken = localStorage.getItem("sessionToken");
         const controller = new AbortController();
         const signal = controller.signal;
-        if (sessionToken === clientSessionToken.value) {
+        if (sessionToken === sessionToken) {
             authApiRequests.logoutFromNextClientToNextServer(true, signal).then(() => {
                 router.push(`/login?redirectFrom=${pathname}`);
             });
@@ -22,7 +20,7 @@ const LogoutPage = () => {
         return () => {
             controller.abort(); // Hủy yêu cầu khi component bị hủy
         };
-    }, [pathname, router, sessionToken]);
+    }, [pathname, router]);
 
     return <div></div>;
 };

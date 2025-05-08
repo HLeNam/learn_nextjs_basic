@@ -8,7 +8,6 @@ import {
     // useState,
 } from "react";
 
-import { clientSessionToken } from "@/lib/http";
 import { AccountResType } from "@/schemaValidations/account.schema";
 
 // const AppContext = createContext<{
@@ -39,25 +38,12 @@ type User = AccountResType["data"];
 
 export default function AppProvider({
     children,
-    initialSessionToken,
     user: userProp,
 }: {
     children: React.ReactNode;
-    initialSessionToken: string | undefined;
     user: User | null;
 }) {
-    // const [sessionToken, setSessionToken] = useState<string>(initialSessionToken || "");
     const [user, setUser] = useState<User | null>(userProp || null);
-
-    useState(() => {
-        if (typeof window !== "undefined") {
-            clientSessionToken.value = initialSessionToken || "";
-        }
-    });
-
-    // useLayoutEffect(() => {
-    //     sessionToken.value = initialSessionToken;
-    // }, [initialSessionToken]);
 
     return (
         <AppContext.Provider

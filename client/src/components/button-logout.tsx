@@ -20,6 +20,9 @@ const ButtonLogout = () => {
             await authApiRequests.logoutFromNextClientToNextServer(true).then(() => {
                 router.push(`/login?redirectFrom=${pathname}`);
             });
+        } finally {
+            localStorage.removeItem("sessionToken");
+            localStorage.removeItem("sessionTokenExpiresAt");
         }
     };
 

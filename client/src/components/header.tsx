@@ -31,6 +31,9 @@ const Header = async ({ user }: { user: AccountResType["data"] | null }) => {
                         </li>
                     </>
                 )}
+                <li>
+                    <ButtonLogout />
+                </li>
             </ul>
             <ModeToggle />
         </div>

@@ -7,10 +7,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
 import AppProvider from "@/app/AppProvider";
-import { cookies } from "next/headers";
 import SlideSession from "@/components/slide-session";
-import accountApiRequests from "@/apiRequests/account";
-import { AccountResType } from "@/schemaValidations/account.schema";
 import { baseOpenGraphMetadata } from "@/app/shared-metadata";
 
 const inter = Inter({
@@ -32,18 +29,7 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("sessionToken")?.value;
-
-    let user: AccountResType["data"] | null = null;
-    try {
-        if (sessionToken) {
-            const data = await accountApiRequests.me(sessionToken);
-            user = data.payload.data;
-        }
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
+    // let user: AccountResType["data"] | null = null;
 
     return (
         <html lang="en" suppressHydrationWarning>
@@ -55,8 +41,8 @@ export default async function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <Header user={user} />
-                    <AppProvider initialSessionToken={sessionToken} user={user}>
+                    <Header user={null} />
+                    <AppProvider user={null}>
                         {children} <SlideSession />
                     </AppProvider>
                 </ThemeProvider>

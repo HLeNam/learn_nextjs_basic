@@ -6,8 +6,10 @@ import { cache } from "react";
 
 const getDetail = cache(productApiRequests.getDetail);
 
+type Params = { id: string };
+
 type Props = {
-    params: Promise<{ id: string }>;
+    params: Promise<Params>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -27,13 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-const ProductEdit = async ({
-    params,
-}: {
-    params: {
-        id: string;
-    };
-}) => {
+const ProductEdit = async ({ params }: { params: Promise<Params> }) => {
     const { id } = await params;
 
     let product = null;

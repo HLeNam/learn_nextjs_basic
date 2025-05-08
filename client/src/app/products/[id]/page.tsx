@@ -6,8 +6,10 @@ import Image from "next/image";
 import envConfig from "@/config";
 import { baseOpenGraphMetadata } from "@/app/shared-metadata";
 
+type Params = { id: string };
+
 type Props = {
-    params: Promise<{ id: string }>;
+    params: Promise<Params>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -44,13 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-const ProductDetail = async ({
-    params,
-}: {
-    params: {
-        id: string;
-    };
-}) => {
+const ProductDetail = async ({ params }: { params: Promise<Params> }) => {
     const { id } = await params;
 
     let product = null;
