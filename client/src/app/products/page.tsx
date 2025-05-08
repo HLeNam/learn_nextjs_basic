@@ -1,10 +1,15 @@
 import productApiRequests from "@/apiRequests/product";
 import DeleteProductButton from "@/app/products/_components/delete-product-button";
 import { Button } from "@/components/ui/button";
+import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 
 const ProductListPage = async () => {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("sessionToken")?.value ?? undefined;
+    const isAuthenticated = !!sessionToken;
+
     const {
         payload: { data: productList },
     } = await productApiRequests.getList();
@@ -12,12 +17,15 @@ const ProductListPage = async () => {
     return (
         <div>
             <h1>Product List</h1>
-            <Link
-                href="/products/add"
-                className="mb-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-                Thêm sản phẩm
-            </Link>
+            {isAuthenticated && (
+                <Link
+                    href="/products/add"
+                    className="mb-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                >
+                    Thêm sản phẩm
+                </Link>
+            )}
+
             <table>
                 <thead>
                     <tr>
@@ -25,7 +33,7 @@ const ProductListPage = async () => {
                         <th>Name</th>
                         <th>Price</th>
                         <th>Description</th>
-                        <th>Actions</th>
+                        {isAuthenticated && <th>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -46,14 +54,16 @@ const ProductListPage = async () => {
                             </td>
                             <td>{product.price}</td>
                             <td>{product.description}</td>
-                            <td>
-                                <div className="flex items-center gap-2">
-                                    <Link href={`/products/${product.id}`}>
-                                        <Button variant="outline">Edit</Button>
-                                    </Link>
-                                    <DeleteProductButton product={product} />
-                                </div>
-                            </td>
+                            {isAuthenticated && (
+                                <td>
+                                    <div className="flex items-center gap-2">
+                                        <Link href={`/products/${product.id}`}>
+                                            <Button variant="outline">Edit</Button>
+                                        </Link>
+                                        <DeleteProductButton product={product} />
+                                    </div>
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>

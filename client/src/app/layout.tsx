@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/sonner";
 import AppProvider from "@/app/AppProvider";
 import { cookies } from "next/headers";
 import SlideSession from "@/components/slide-session";
+import accountApiRequests from "@/apiRequests/account";
+import { AccountResType } from "@/schemaValidations/account.schema";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -28,6 +30,16 @@ export default async function RootLayout({
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get("sessionToken")?.value;
 
+    let user: AccountResType["data"] | null = null;
+    try {
+        if (sessionToken) {
+            const data = await accountApiRequests.me(sessionToken);
+            user = data.payload.data;
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${inter.className} antialiased`}>
@@ -38,8 +50,8 @@ export default async function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <Header />
-                    <AppProvider initialSessionToken={sessionToken}>
+                    <Header user={user} />
+                    <AppProvider initialSessionToken={sessionToken} user={user}>
                         {children} <SlideSession />
                     </AppProvider>
                 </ThemeProvider>

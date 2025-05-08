@@ -1,23 +1,9 @@
-import accountApiRequests from "@/apiRequests/account";
 import ButtonLogout from "@/components/button-logout";
 import { ModeToggle } from "@/components/mode-toggle";
-import { cookies } from "next/headers";
+import { AccountResType } from "@/schemaValidations/account.schema";
 import Link from "next/link";
 
-const Header = async () => {
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("sessionToken")?.value ?? undefined;
-
-    let user = null;
-    try {
-        if (sessionToken) {
-            const data = await accountApiRequests.me(sessionToken);
-            user = data.payload.data;
-        }
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
-
+const Header = async ({ user }: { user: AccountResType["data"] | null }) => {
     return (
         <div>
             <ul className="flex items-center gap-4">
@@ -27,9 +13,9 @@ const Header = async () => {
                 {user ? (
                     <>
                         <li>
-                            <div>
+                            <Link href={`/me`}>
                                 Xin chào <strong>{user.name}</strong>
-                            </div>
+                            </Link>
                         </li>
                         <li>
                             <ButtonLogout />
