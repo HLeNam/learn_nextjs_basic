@@ -56,7 +56,8 @@ const LoginForm = () => {
             // clientSessionToken.value = result.payload.data.token;
 
             // Chuyển hướng đến trang "/me"
-            router.push("/me");
+            // router.push("/me");
+            router.push("/");
         } catch (error: unknown) {
             handleErrorApi<LoginBodyType>({
                 error,
