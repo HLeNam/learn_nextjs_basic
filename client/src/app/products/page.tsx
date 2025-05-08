@@ -41,14 +41,19 @@ const ProductListPage = async () => {
                         <tr key={product.id}>
                             <td>{product.id}</td>
                             <td className="flex items-center gap-2">
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    width={180}
-                                    height={270}
-                                    priority
-                                    className="w-full h-auto rounded-md object-cover"
-                                />
+                                <Link
+                                    href={`/products/${product.id}`}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        width={180}
+                                        height={270}
+                                        priority
+                                        className="w-full h-auto rounded-md object-cover"
+                                    />
+                                </Link>
 
                                 {product.name}
                             </td>
@@ -57,7 +62,7 @@ const ProductListPage = async () => {
                             {isAuthenticated && (
                                 <td>
                                     <div className="flex items-center gap-2">
-                                        <Link href={`/products/${product.id}`}>
+                                        <Link href={`/products/${product.id}/edit`}>
                                             <Button variant="outline">Edit</Button>
                                         </Link>
                                         <DeleteProductButton product={product} />
