@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import ButtonRedirect from "@/app/components/ButtonRedirect";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Trang chủ",
+    description: "Trang chủ của productic",
+};
 
 const isAuth = true; // Simulating authentication status
 export default function Home() {

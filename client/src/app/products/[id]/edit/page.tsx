@@ -1,6 +1,31 @@
 import productApiRequests from "@/apiRequests/product";
 import ProductAddForm from "@/app/products/_components/product-add-form";
 import { HttpError } from "@/lib/http";
+import { Metadata } from "next";
+import { cache } from "react";
+
+const getDetail = cache(productApiRequests.getDetail);
+
+type Props = {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    // read route params
+    const { id } = await params;
+
+    // fetch data
+    const {
+        payload: { data },
+    } = await getDetail(Number(id));
+    const product = data;
+
+    return {
+        title: `Sửa sản phẩm: ${product.name}`,
+        description: product.description,
+    };
+}
 
 const ProductEdit = async ({
     params,

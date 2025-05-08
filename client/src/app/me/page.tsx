@@ -3,6 +3,12 @@ import { cookies } from "next/headers";
 import Profile from "@/app/me/profile";
 import accountApiRequests from "@/apiRequests/account";
 import ProfileForm from "@/app/me/profile-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Hồ sơ cá nhân",
+    description: "Hồ sơ cá nhân của bạn",
+};
 
 const MeProfile = async () => {
     const cookieStore = await cookies();

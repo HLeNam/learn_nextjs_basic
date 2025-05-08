@@ -1,9 +1,15 @@
 import productApiRequests from "@/apiRequests/product";
 import DeleteProductButton from "@/app/products/_components/delete-product-button";
 import { Button } from "@/components/ui/button";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: "Danh sách sản phẩm",
+    description: "Danh sách sản phẩm của productic",
+};
 
 const ProductListPage = async () => {
     const cookieStore = await cookies();

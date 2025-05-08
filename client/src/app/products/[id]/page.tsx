@@ -1,6 +1,28 @@
 import productApiRequests from "@/apiRequests/product";
 import { HttpError } from "@/lib/http";
+import { Metadata } from "next";
 import Image from "next/image";
+
+type Props = {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    // read route params
+    const { id } = await params;
+
+    // fetch data
+    const {
+        payload: { data },
+    } = await productApiRequests.getDetail(Number(id));
+    const product = data;
+
+    return {
+        title: product.name,
+        description: product.description,
+    };
+}
 
 const ProductDetail = async ({
     params,

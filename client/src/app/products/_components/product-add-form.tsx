@@ -25,6 +25,7 @@ import {
 import productApiRequests from "@/apiRequests/product";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 type Product = ProductResType["data"];
 
@@ -46,6 +47,8 @@ const ProductAddForm = ({ product }: { product?: Product }) => {
     });
 
     const image = form.watch("image");
+
+    const router = useRouter();
 
     // 2. Define a submit handler.
     async function onSubmit(values: CreateProductBodyType) {
@@ -77,6 +80,7 @@ const ProductAddForm = ({ product }: { product?: Product }) => {
                 result = await productApiRequests.update(product.id, {
                     ...values,
                 });
+                router.refresh();
             } else {
                 // Nếu không có sản phẩm, gọi API tạo mới
                 result = await productApiRequests.create({
